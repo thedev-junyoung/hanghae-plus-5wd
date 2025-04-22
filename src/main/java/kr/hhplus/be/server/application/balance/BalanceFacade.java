@@ -1,11 +1,6 @@
 package kr.hhplus.be.server.application.balance;
 
-import jakarta.transaction.Transactional;
-import kr.hhplus.be.server.domain.balance.BalanceException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.OptimisticLockingFailureException;
-import org.springframework.retry.annotation.Backoff;
-import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 
 

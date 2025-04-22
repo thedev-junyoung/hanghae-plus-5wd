@@ -5,7 +5,6 @@ import kr.hhplus.be.server.application.coupon.ApplyCouponResult;
 import kr.hhplus.be.server.application.coupon.CouponUseCase;
 import kr.hhplus.be.server.application.product.*;
 import kr.hhplus.be.server.common.vo.Money;
-import kr.hhplus.be.server.domain.product.ProductStock;
 import org.springframework.transaction.annotation.Transactional;
 import kr.hhplus.be.server.domain.order.Order;
 import kr.hhplus.be.server.domain.order.OrderItem;

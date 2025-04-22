@@ -3,7 +3,6 @@ package kr.hhplus.be.server.application.product;
 import kr.hhplus.be.server.domain.product.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
