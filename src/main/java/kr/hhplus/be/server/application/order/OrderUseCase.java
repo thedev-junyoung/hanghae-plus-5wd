@@ -22,4 +22,6 @@ public interface OrderUseCase {
      * 주문을 결제 완료 상태로 변경
      */
     void markConfirmed(Order order);
+
+    Order getOrderForPaymentWithLock(String orderId); // 주문을 잠금 처리하여 동시성 문제를 방지
 }

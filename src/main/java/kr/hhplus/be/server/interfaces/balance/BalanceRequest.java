@@ -17,4 +17,10 @@ public class BalanceRequest {
     @Min(0)
     @Schema(description = "충전 금액", example = "50000")
     private long amount;
+
+
+    @NotNull
+    @Schema(description = "고유 요청 식별자", example = "request-12345")
+    private String requestId;
+
 }

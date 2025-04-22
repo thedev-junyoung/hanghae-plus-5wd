@@ -2,6 +2,7 @@ package kr.hhplus.be.server.application.balance;
 
 import kr.hhplus.be.server.domain.balance.Balance;
 import kr.hhplus.be.server.domain.balance.BalanceException;
+import kr.hhplus.be.server.domain.balance.BalanceHistoryRepository;
 import kr.hhplus.be.server.domain.balance.BalanceRepository;
 import kr.hhplus.be.server.common.vo.Money;
 import org.junit.jupiter.api.DisplayName;
@@ -14,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
  
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -27,15 +29,20 @@ class BalanceServiceTest {
     @InjectMocks
     BalanceService balanceService;
 
+    @Mock
+    BalanceHistoryRepository balanceHistoryRepository;
+
     @Test
     @DisplayName("잔액을 충전할 수 있다")
     void charge_success() {
+
+        String requestId = "REQ-" + UUID.randomUUID();
         // given
         Balance existing = Balance.createNew(1L, 100L, Money.wons(1000));
         when(balanceRepository.findByUserId(100L)).thenReturn(Optional.of(existing));
         when(balanceRepository.save(eq(existing))).thenReturn(existing); // eq로 명시적 비교
 
-        ChargeBalanceCommand command = new ChargeBalanceCommand(100L, 1000);
+        ChargeBalanceCommand command = new ChargeBalanceCommand(100L, 1000, "충전 테스트", requestId);
 
         // when
         BalanceInfo info = balanceService.charge(command);

@@ -25,6 +25,7 @@ class OrderFacadeServiceTest {
     private OrderService orderService;
     private OrderEventService orderEventService;
     private CouponUseCase couponUseCase;
+    private StockService stockService;
 
     private OrderFacadeService orderFacadeService;
 
@@ -34,8 +35,9 @@ class OrderFacadeServiceTest {
         orderService = mock(OrderService.class);
         orderEventService = mock(OrderEventService.class);
         couponUseCase = mock(CouponUseCase.class);
+        stockService = mock(StockService.class);
 
-        orderFacadeService = new OrderFacadeService(productService, orderService, orderEventService, couponUseCase);
+        orderFacadeService = new OrderFacadeService(productService, orderService, orderEventService, couponUseCase, stockService);
     }
 
     @Test
@@ -86,9 +88,9 @@ class OrderFacadeServiceTest {
 
         // verify interactions
         verify(productService).getProductDetail(any(GetProductDetailCommand.class));
-        verify(productService).decreaseStock(any(DecreaseStockCommand.class));
         verify(couponUseCase).applyCoupon(any(ApplyCouponCommand.class));
         verify(orderService).createOrder(eq(userId), anyList(), eq(discountedTotal));
         verify(orderEventService).recordPaymentCompletedEvent(any(Order.class));
+        verify(stockService).decrease(any(DecreaseStockCommand.class));
     }
 }

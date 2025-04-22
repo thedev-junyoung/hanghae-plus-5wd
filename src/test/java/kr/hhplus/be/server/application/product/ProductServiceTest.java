@@ -80,45 +80,5 @@ class ProductServiceTest {
                 .isInstanceOf(ProductException.NotFoundException.class);
     }
 
-    @Test
-    @DisplayName("상품 재고 차감 성공")
-    void decreaseStock_success() {
-        // given
-        Product product = Product.create("Jordan 1", "Nike", Money.wons(200_000),
-                LocalDate.of(2024, 1, 1), "image.jpg", "best seller");
 
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-
-        ProductStock stock = ProductStock.of(1L, 260, 5); // 충분한 재고
-        when(productStockRepository.findByProductIdAndSize(1L, 260))
-                .thenReturn(Optional.of(stock));
-
-        // when
-        boolean result = productService.decreaseStock(new DecreaseStockCommand(1L, 260, 3));
-
-        // then
-        assertThat(result).isTrue();
-        verify(productStockRepository).save(any()); 
-        verify(productStockRepository).save(any());
-    }
-
-
-    @Test
-    @DisplayName("상품 재고 차감 실패 - 재고 부족")
-    void decreaseStock_insufficient() {
-        // given
-        Product product = Product.create("Jordan 1", "Nike", Money.wons(200_000),
-                LocalDate.of(2024, 1, 1), "image.jpg", "best seller");
-
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-
-        ProductStock insufficientStock = ProductStock.of(1L, 260, 2); // 2개밖에 없음
-        when(productStockRepository.findByProductIdAndSize(1L, 260))
-                .thenReturn(Optional.of(insufficientStock));
-
-        // when & then
-        assertThatThrownBy(() ->
-                productService.decreaseStock(new DecreaseStockCommand(1L, 260, 5)))
-                .isInstanceOf(ProductException.InsufficientStockException.class);
-    }
 }

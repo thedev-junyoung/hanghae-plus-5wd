@@ -9,6 +9,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.UUID;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
@@ -28,9 +30,9 @@ class BalanceHistoryServiceIntegrationTest {
         // given
         Long userId = 100L;
         String reason = "충전 테스트";
-
+        String requestId = "REQ-" + UUID.randomUUID();
         RecordBalanceHistoryCommand command = new RecordBalanceHistoryCommand(
-                userId, 5000L, BalanceChangeType.CHARGE, reason
+                userId, 5000L, BalanceChangeType.CHARGE, reason, requestId
         );
 
         // when
@@ -41,5 +43,29 @@ class BalanceHistoryServiceIntegrationTest {
         assertThat(history.getUserId()).isEqualTo(userId);
         assertThat(history.getAmount()).isEqualTo(5000L);
         assertThat(history.getReason()).isEqualTo(reason);
+    }
+
+    @Test
+    @DisplayName("동일한 requestId가 있는 경우 중복 저장되지 않는다")
+    void recordHistory_shouldBeIdempotent() {
+        // given
+        long userId = 100L;
+        String requestId = "REQ-HISTORY-IDEMPOTENT";
+        String reason = "중복 저장 테스트";
+
+        RecordBalanceHistoryCommand command = new RecordBalanceHistoryCommand(
+                userId, 5000L, BalanceChangeType.CHARGE, reason, requestId
+        );
+
+        // when - 두 번 호출
+        service.recordHistory(command);
+        service.recordHistory(command); // 중복 호출
+
+        // then - 한 번만 저장돼야 함
+        long count = repository.findAllByUserId(userId).stream()
+                .filter(h -> requestId.equals(h.getRequestId()))
+                .count();
+
+        assertThat(count).isEqualTo(1);
     }
 }

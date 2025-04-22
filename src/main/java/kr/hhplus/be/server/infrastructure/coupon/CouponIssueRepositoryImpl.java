@@ -32,4 +32,9 @@ public class CouponIssueRepositoryImpl implements CouponIssueRepository {
     public long count() {
         return jpaRepository.count();
     }
+
+    @Override
+    public long countByCouponCode(String code) {
+        return jpaRepository.countByCouponCode(code);
+    }
 }

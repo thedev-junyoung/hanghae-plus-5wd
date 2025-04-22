@@ -100,7 +100,7 @@ public class CouponConcurrencyTest {
 
         latch.await();
 
-        long totalIssued = couponIssueRepository.count();
+        long totalIssued = couponIssueRepository.countByCouponCode(COUPON_CODE);
 
         System.out.println("\n=== ✅ 결과 요약 ===");
         System.out.printf("총 요청 수: %d명\n", CONCURRENCY);

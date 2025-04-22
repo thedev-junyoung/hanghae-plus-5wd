@@ -10,4 +10,8 @@ public interface CouponRepository {
      * 쿠폰을 삭제한다.
      */
     Coupon findByCode(String code); // 못 찾으면 CouponNotFoundException
+
+
+    Coupon findByCodeForUpdate(String code);
+
 }

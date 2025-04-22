@@ -128,4 +128,8 @@ public class OrderConcurrencyTest {
 
         assertThat(stock.getStockQuantity()).isEqualTo(0);
         assertThat(diff).isEqualTo(2);
-    }}
+    }
+
+
+
+}
