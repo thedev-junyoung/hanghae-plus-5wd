@@ -16,9 +16,9 @@
 
 | 보고서명 | 설명 |
 | --- | --- |
-| [**popular-products-performance.md**](./report/popular-products-performance.md) | `stat_date + sales_count` 복합 정렬 조건에 대한 병목 분석 |
-| [**product-list-created-at-desc-performance.md**](./report/product-list-created-at-desc-performance.md) | 최신순 정렬 + 페이징 (OFFSET, Cursor 기반) 성능 비교 |
-| [**product-list-price-sort-performance.md**](./report/product-list-price-sort-performance.md) | 가격 정렬 기준에서 filesort 제거 및 FORCE INDEX 전략 검토 |
+| [**popular-products-performance.md**](report/index-optimization-step08/popular-products-performance.md) | `stat_date + sales_count` 복합 정렬 조건에 대한 병목 분석 |
+| [**product-list-created-at-desc-performance.md**](report/index-optimization-step08/product-list-created-at-desc-performance.md) | 최신순 정렬 + 페이징 (OFFSET, Cursor 기반) 성능 비교 |
+| [**product-list-price-sort-performance.md**](report/index-optimization-step08/product-list-price-sort-performance.md) | 가격 정렬 기준에서 filesort 제거 및 FORCE INDEX 전략 검토 |
 
 각 보고서에는 다음이 포함되어 있습니다:
 
