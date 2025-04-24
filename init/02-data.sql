@@ -61,7 +61,9 @@ VALUES
 -- Orders
 INSERT INTO orders (id, user_id, total_amount, status, created_at)
 VALUES
-    ('order-1', 100, 398000, 'CONFIRMED', NOW());
+    ('order-1', 100, 398000, 'CONFIRMED', NOW()),
+    ('order-2', 101, 169000, 'CREATED', NOW());
+
 
 -- Order Item
 INSERT INTO order_item (id, product_id, quantity, size, price, order_id)

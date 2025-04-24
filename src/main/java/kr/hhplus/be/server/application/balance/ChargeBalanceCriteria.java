@@ -14,10 +14,10 @@ public record ChargeBalanceCriteria(
 
     public static ChargeBalanceCriteria fromRequest(BalanceRequest request) {
         return new ChargeBalanceCriteria(
-                request.getUserId(),
-                request.getAmount(),
+                request.userId(),
+                request.amount(),
                 "사용자 요청에 따른 충전",
-                request.getRequestId() // ✅ 프론트에서 넘겨주는 requestId
+                request.requestId() // ✅ 프론트에서 넘겨주는 requestId
         );
     }
 }

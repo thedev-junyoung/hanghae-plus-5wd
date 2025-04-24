@@ -9,7 +9,7 @@ public interface OrderRepository{
      * 주문을 저장하거나 업데이트한다.
      * 주문이 새로 생성되거나 변경된 경우 호출.
      */
-    void save(Order order);
+    Order save(Order order);
 
     /**
      * 주문 ID로 주문을 조회한다.

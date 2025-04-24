@@ -24,8 +24,9 @@ public class ProductException extends BusinessException {
         }
     }
 
-    public static class NotFoundException extends RuntimeException {
+    public static class NotFoundException extends BusinessException {
         public NotFoundException(Long productId) {
+            super(ErrorCode.ENTITY_NOT_FOUND, "상품을 찾을 수 없습니다. (상품 ID: " + productId + ")");
         }
     }
 

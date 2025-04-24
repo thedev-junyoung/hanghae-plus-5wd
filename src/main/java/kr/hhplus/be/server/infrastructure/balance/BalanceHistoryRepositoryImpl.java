@@ -24,6 +24,11 @@ public class BalanceHistoryRepositoryImpl implements BalanceHistoryRepository {
     }
 
     @Override
+    public boolean existsByUserIdAndReason(Long userId, String reason) {
+        return balanceHistoryJpaRepository.existsByUserIdAndReason(userId, reason);
+    }
+
+    @Override
     public boolean existsByRequestId(String s) {
         return balanceHistoryJpaRepository.existsByRequestId(s);
     }

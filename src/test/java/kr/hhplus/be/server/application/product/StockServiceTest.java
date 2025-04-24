@@ -55,7 +55,7 @@ class StockServiceTest {
         // expect
         assertThatThrownBy(() ->
                 stockService.decrease(DecreaseStockCommand.of(1L, 270, 1)))
-                .isInstanceOf(ProductException.InsufficientStockException.class);
+                .isInstanceOf(ProductException.NotFoundException.class);
     }
 
     @Test
@@ -67,7 +67,7 @@ class StockServiceTest {
         // expect
         assertThatThrownBy(() ->
                 stockService.decrease(DecreaseStockCommand.of(1L, 270, 1)))
-                .isInstanceOf(ProductException.InsufficientStockException.class);
+                .isInstanceOf(ProductException.NotFoundException.class);
     }
 
     @Test

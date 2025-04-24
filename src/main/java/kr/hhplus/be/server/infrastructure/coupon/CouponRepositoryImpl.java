@@ -7,6 +7,10 @@ import kr.hhplus.be.server.domain.coupon.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.Collection;
+import java.util.List;
+
 @Repository
 @RequiredArgsConstructor
 public class CouponRepositoryImpl implements CouponRepository {
@@ -27,5 +31,15 @@ public class CouponRepositoryImpl implements CouponRepository {
     public Coupon findByCodeForUpdate(String code) {
         return jpaRepository.findByCodeForUpdate(code)
                 .orElseThrow(() -> new CouponException.NotFoundException(code));
+    }
+
+    @Override
+    public Collection<Coupon> findAll() {
+        return jpaRepository.findAll();
+    }
+
+    @Override
+    public Collection<Coupon> findExpiredCoupons() {
+        return jpaRepository.findExpiredCoupons(LocalDateTime.now());
     }
 }

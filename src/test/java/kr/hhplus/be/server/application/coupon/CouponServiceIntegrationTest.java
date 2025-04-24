@@ -10,6 +10,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.util.concurrent.ThreadLocalRandom;
+
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 /**
@@ -34,7 +36,7 @@ class CouponServiceIntegrationTest {
     @Autowired
     CouponIssueRepository couponIssueRepository;
 
-    Long userId = 100L;
+    Long userId = ThreadLocalRandom.current().nextLong(10_000_000, 99_999_999);
     String couponCode = "TESTONLY1000";
 
     @Test

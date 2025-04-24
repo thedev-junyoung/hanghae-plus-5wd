@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 public interface CouponJpaRepository extends JpaRepository<Coupon, Long> {
@@ -16,4 +18,7 @@ public interface CouponJpaRepository extends JpaRepository<Coupon, Long> {
     @Query("SELECT c FROM Coupon c WHERE c.code = :code")
     Optional<Coupon> findByCodeForUpdate(@Param("code") String code);
 
+
+    @Query("SELECT c FROM Coupon c WHERE c.validUntil < :now")
+    List<Coupon> findExpiredCoupons(@Param("now") LocalDateTime now);
 }

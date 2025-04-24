@@ -12,4 +12,8 @@ public interface BalanceRepository{
      * 사용자 잔액을 조회한다.
      */
     Optional<Balance> findByUserId(Long userId);
+
+    void flush();
+
+    void clear();
 }

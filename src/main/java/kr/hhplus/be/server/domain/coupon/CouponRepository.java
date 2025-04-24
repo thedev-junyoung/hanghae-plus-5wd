@@ -1,5 +1,7 @@
 package kr.hhplus.be.server.domain.coupon;
 
+import java.util.Collection;
+
 public interface CouponRepository {
     /**
      * 쿠폰을 저장하거나 업데이트한다.
@@ -14,4 +16,7 @@ public interface CouponRepository {
 
     Coupon findByCodeForUpdate(String code);
 
+    Collection<Coupon> findAll();
+
+    Collection<Coupon> findExpiredCoupons();
 }

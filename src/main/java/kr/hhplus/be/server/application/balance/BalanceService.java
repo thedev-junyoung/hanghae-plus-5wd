@@ -25,6 +25,7 @@ public class BalanceService implements BalanceUseCase {
         if (balanceHistoryRepository.existsByRequestId(command.requestId())) {
             log.warn("이미 처리된 충전 요청입니다: userId={}, requestId={}", command.userId(), command.requestId());
             Balance existing = balanceRepository.findByUserId(command.userId()).orElseThrow();
+            System.out.println("existing = " + existing);
             return BalanceInfo.from(existing); // 이전 충전 결과 그대로 반환
         }
 
@@ -33,7 +34,7 @@ public class BalanceService implements BalanceUseCase {
 
         balance.charge(Money.wons(command.amount()));
         balanceRepository.save(balance);
-
+        System.out.println("balance = " + balance);
         return BalanceInfo.from(balance);
     }
 
@@ -44,7 +45,7 @@ public class BalanceService implements BalanceUseCase {
     public BalanceResult getBalance(Long userId) {
         Balance balance = balanceRepository.findByUserId(userId)
                 .orElseThrow(() -> new BalanceException.NotFoundException(userId));
-
+        System.out.println("balance = " + balance);
         return BalanceResult.fromInfo(BalanceInfo.from(balance));
     }
 
