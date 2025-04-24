@@ -1,43 +1,46 @@
-# **STEP08 - DB & 동시성 테스트 과제**
+# **STEP09 - 동시성 제어 구현 과제**
 
 ## 📌 프로젝트 개요
 
-이 과제는 **DB 조회 성능 최적화**와 **동시성 이슈 탐지 및 검증 테스트**를 목표로 합니다.
+이번 과제는 **실제 비즈니스 시나리오 기반의 동시성 이슈를 식별**하고, 이를 해결하기 위해 **낙관적/비관적 락, 멱등성 처리, 재시도 전략 등**을 직접 적용해보는 데 목적이 있습니다.
 
-병목이 발생할 수 있는 조회 쿼리를 실험적으로 재현하고, **인덱스 적용 전후의 실행 계획을 비교 분석**하여 사전 성능 개선 가능성을 검증했습니다.
+단순한 트랜잭션 분리 수준을 넘어, **정합성을 보장하면서도 성능을 고려한 현실적인 동시성 처리 전략**을 도입하였습니다.
 
 ---
 
 ## ✅ 주요 구성
 
-### 1. 📊 **조회 성능 병목 분석 및 인덱스 최적화 보고서**
+### 1. 🔐 **도메인별 동시성 처리 전략**
 
-다음 3가지 API를 대상으로 **실행 계획(Explain Analyze)** 기반의 병목 분석과 인덱스 전략을 수립했습니다:
+| 도메인 | 처리 방식 | 상세 설명 |
+| --- | --- | --- |
+| **Balance (잔액)** | 낙관적 락 + 멱등성 | `@Version`으로 충돌 감지 + `@Retryable` 재시도 + `requestId`로 중복 방지 |
+| **Coupon (쿠폰 발급)** | 비관적 락 | `SELECT FOR UPDATE`로 수량 감소 경쟁 제어, 사용자 중복 발급 방지 |
+| **Order (상품 재고)** | 비관적 락 | `SELECT FOR UPDATE`로 재고 차감, 재고 부족 시 즉시 실패 처리 |
+| **Payment (결제 중복)** | 비관적 락 | 주문 조회 시 락 선점 후 상태 검증, 한 요청만 결제 성공 처리 |
 
-| 보고서명 | 설명 |
-| --- | --- |
-| [**popular-products-performance.md**](./report/popular-products-performance.md) | `stat_date + sales_count` 복합 정렬 조건에 대한 병목 분석 |
-| [**product-list-created-at-desc-performance.md**](./report/product-list-created-at-desc-performance.md) | 최신순 정렬 + 페이징 (OFFSET, Cursor 기반) 성능 비교 |
-| [**product-list-price-sort-performance.md**](./report/product-list-price-sort-performance.md) | 가격 정렬 기준에서 filesort 제거 및 FORCE INDEX 전략 검토 |
+---
 
-각 보고서에는 다음이 포함되어 있습니다:
+### 2. 🧪 **동시성 테스트**
 
-- 실행 계획 (인덱스 전/후 비교)
-- Covering Index, Cursor 방식 적용 결과
-- Top-N 정렬 병목 제거 전략
-- 실시간 API 기준으로 실무 적용 가능한 개선안
+각 시나리오에 대해 실제 상황을 시뮬레이션하는 **멀티스레드 기반의 통합 테스트**를 구성했습니다.
 
-### 2. ⚠️ **동시성 테스트 (Concurrency Tests)**
+| 테스트명 | 설명 | 테스트 클래스                                                                                                         |
+| --- | --- |-----------------------------------------------------------------------------------------------------------------|
+| **잔액 충전** | 10명이 동시에 충전 시 잔액 정확히 누적 | [`BalanceConcurrencyTest`](./src/test/java/kr/hhplus/be/server/application/balance/BalanceConcurrencyTest.java) |
+| **쿠폰 발급** | 10명이 2개 한정 쿠폰 요청 → 초과 없음 | [`CouponConcurrencyTest`](./src/test/java/kr/hhplus/be/server/application/coupon/CouponConcurrencyTest.java)    |
+| **주문 재고** | 3명이 동시에 5개씩 주문 (재고 10개) → 2건 성공 | [`OrderConcurrencyTest`](./src/test/java/kr/hhplus/be/server/application/order/OrderConcurrencyTest.java)       |
+| **결제** | 동일 주문에 여러 결제 시도 → 1건만 성공 | [`PaymentConcurrencyTest`](./src/test/java/kr/hhplus/be/server/application/payment/PaymentConcurrencyTest.java) |
 
-동시성 테스트는 단위 로직이 아닌, **애플리케이션 레이어의 협력 시나리오를 통해 이슈를 재현**하는 방식으로 구성하였습니다.
+---
 
-각 테스트는 명확한 시나리오를 기반으로 설계되었고, **동시성 제어가 없는 상태에서 실패해야 정상**입니다.
+### 3. 📃 **보고서 작성**
 
-| 테스트명 | 설명 | 링크                                                                                                                |
-| --- | --- |-------------------------------------------------------------------------------------------------------------------|
-| 주문 재고 차감 | 3명이 동시에 동일 상품을 5개씩 주문 (재고 10개) → 최대 2건 성공 | [**OrderConcurrencyTest**](./src/test/java/kr/hhplus/be/server/application/order/OrderConcurrencyTest.java)       |
-| 잔액 충전 | 10명이 동시에 10,000원씩 충전 요청 → 최종 잔액은 100,000원 | [**BalanceConcurrencyTest**](./src/test/java/kr/hhplus/be/server/application/balance/BalanceConcurrencyTest.java) |
-| 쿠폰 발급 | 10명이 동시에 2개 한정 쿠폰을 발급 요청 → 초과 발급 여부 확인 | [**CouponConcurrencyTest**](./src/test/java/kr/hhplus/be/server/application/coupon/CouponConcurrencyTest.java)    |
+- [`report/concurrency-control-step09/📝 step09-concurrency-report.md`](./report/concurrency-control-step09/📄%20step09-concurrency-report.md)
+    - 문제 식별 → 원인 분석 → 해결 전략 → 테스트 결과 → 한계점까지 포함된 보고서입니다.
+    - 락 방식 비교, transaction propagation 전략, 멱등성 처리의 필요성 등 실무 고려 요소들을 정리했습니다.
+
+---
 
 ## ⚙️ 실행 방법
 
@@ -59,6 +62,15 @@
 ./gradlew test
 ```
 
-- **Testcontainers 기반 통합 테스트**가 실행됩니다.
-- DB 설정을 별도로 할 필요 없이 `application.yml` 설정 없이 자동 구성됩니다.
-- 모든 테스트는 `@Transactional`로 격리되어 **신뢰 가능한 시뮬레이션 환경**에서 실행됩니다.
+모든 동시성 테스트는 멀티스레드 환경에서 실행됩니다.
+@Transactional(propagation = NOT_SUPPORTED) 설정을 통해 테스트 트랜잭션을 명확히 분리합니다.
+
+## 💡 주요 학습 포인트
+
+- DB 락의 특성과 적용 위치의 중요성 (낙관적 vs 비관적)
+- 트랜잭션 전파 속성에 따른 설계 전략
+- 멱등성과 재시도 처리가 실무에서 중요한 이유
+- 테스트 시나리오 설계가 문제 재현 및 해결의 출발점이라는 점
+
+실제로 발생할 수 있는 동시성 문제를 단위가 아닌 흐름 중심으로 설계하고 해결하는 방식은
+서비스의 정합성 보장과 운영 안정성 확보 측면에서 큰 인사이트를 제공했습니다.
