@@ -28,6 +28,23 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 
+/**
+ * 결제 요청의 중복 처리를 방지하는 동시성 테스트 클래스.
+ *
+ * <p>하나의 주문에 대해 여러 명이 동시에 결제를 요청하는 시나리오를 시뮬레이션한다.</p>
+ *
+ * <p>적용된 동시성 제어 방식:</p>
+ * <ul>
+ *   <li>주문 객체 조회 시 `@Lock(PESSIMISTIC_WRITE)`으로 선점</li>
+ *   <li>잔액 차감, 결제 저장, 주문 상태 변경을 하나의 트랜잭션 내에서 처리</li>
+ * </ul>
+ *
+ * <p>검증 포인트:</p>
+ * <ul>
+ *   <li>결제 요청이 동시에 들어와도 오직 1건만 성공</li>
+ *   <li>나머지는 중복 처리로 인해 예외 발생</li>
+ * </ul>
+ */
 
 @SpringBootTest
 public class PaymentConcurrencyTest {

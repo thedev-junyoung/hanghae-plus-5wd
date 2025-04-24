@@ -16,6 +16,26 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+
+/**
+ * 낙관적 락 기반의 동시성 충전 테스트 클래스.
+ *
+ * <p>이 테스트는 동일 사용자에 대해 동시에 충전 요청이 들어오는 상황을 시뮬레이션한다.</p>
+ *
+ * <p>적용된 동시성 제어 방식:</p>
+ * <ul>
+ *   <li>JPA의 `@Version`을 활용한 낙관적 락</li>
+ *   <li>Spring Retry의 `@Retryable`로 충돌 시 재시도</li>
+ *   <li>각 요청마다 `requestId`를 부여하여 멱등성 보장</li>
+ *   <li>InMemoryRateLimiter로 짧은 시간 내 중복 요청 방지</li>
+ * </ul>
+ *
+ * <p>검증 포인트:</p>
+ * <ul>
+ *   <li>모든 충전 요청이 중복 없이 정확하게 누적된다</li>
+ *   <li>최종 잔액 = 성공한 요청 수 × 충전 금액</li>
+ * </ul>
+ */
 @SpringBootTest
 public class BalanceConcurrencyTest {
 

@@ -23,27 +23,25 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-
 /**
- * 동시성 이슈를 재현하기 위한 통합 테스트 클래스.
+ * 비관적 락 기반의 동시 쿠폰 발급 테스트 클래스.
  *
- * <p>이 테스트는 10명의 사용자가 동시에 같은 쿠폰을 발급받으려 할 때 발생할 수 있는
- * 재고 차감 관련 동시성 문제를 검증한다.</p>
+ * <p>10명의 사용자가 동시에 수량 제한 쿠폰을 발급받으려는 상황을 시뮬레이션한다.</p>
  *
- * <p>시나리오:</p>
+ * <p>적용된 동시성 제어 방식:</p>
  * <ul>
- *   <li>초기 쿠폰 수량은 2개</li>
- *   <li>각 사용자당 1개씩 발급 요청</li>
- *   <li>10명의 사용자가 동시에 쿠폰을 요청하면 이론상 최대 2명만 성공 가능</li>
+ *   <li>JPA `@Lock(PESSIMISTIC_WRITE)`으로 select for update 처리</li>
+ *   <li>도메인 로직에서 수량 차감 책임 분리 및 검증</li>
+ *   <li>사용자 중복 발급 방지를 위한 유니크 체크</li>
  * </ul>
  *
- * <p>기대 결과:</p>
+ * <p>검증 포인트:</p>
  * <ul>
- *   <li>발급된 쿠폰 수는 2건 이하</li>
+ *   <li>실제 발급된 쿠폰 수량은 최대 재고 수량을 초과하지 않는다</li>
+ *   <li>중복 발급 없이 정합성 유지</li>
  * </ul>
- *
- * <p>⚠️ 해당 테스트는 동시성 처리를 하지 않은 상태에서 실패해야 정상이다.
  */
+
 @SpringBootTest
 public class CouponConcurrencyTest {
 
