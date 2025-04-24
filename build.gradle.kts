@@ -52,6 +52,10 @@ dependencies {
 	// https://mvnrepository.com/artifact/io.swagger.core.v3/swagger-gradle-plugin
 	implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.7.0")
 
+	// Spring AOP
+	implementation("org.springframework.boot:spring-boot-starter-aop")
+	implementation("org.springframework.retry:spring-retry")
+
 }
 
 tasks.withType<Test> {

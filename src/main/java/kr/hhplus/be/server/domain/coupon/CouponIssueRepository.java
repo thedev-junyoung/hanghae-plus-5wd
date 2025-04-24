@@ -9,5 +9,6 @@ public interface CouponIssueRepository {
     Optional<CouponIssue> findByUserIdAndCouponId(Long userId, Long couponId);
 
     long count();
+    long countByCouponCode(String code);
 
 }

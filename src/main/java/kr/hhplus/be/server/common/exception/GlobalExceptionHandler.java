@@ -2,6 +2,7 @@ package kr.hhplus.be.server.common.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import kr.hhplus.be.server.common.dto.CustomApiResponse;
+import kr.hhplus.be.server.common.rate.RateLimitExceededException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.OptimisticLockingFailureException;
@@ -132,6 +133,18 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+    /**
+     * 레이트 리미트 초과 예외 처리
+     */
+    @ExceptionHandler(RateLimitExceededException.class)
+    protected ResponseEntity<CustomApiResponse<Object>> handleRateLimitExceededException(RateLimitExceededException e) {
+        log.warn("handleRateLimitExceededException", e);
+        final CustomApiResponse<Object> response = CustomApiResponse.error(
+                ErrorCode.TOO_MANY_REQUESTS.getMessage()
+        );
+        return ResponseEntity.status(ErrorCode.TOO_MANY_REQUESTS.getStatus()).body(response);
+    }
+
 
     private List<String> createFieldErrorDetails(BindingResult bindingResult) {
         List<String> errors = new ArrayList<>();

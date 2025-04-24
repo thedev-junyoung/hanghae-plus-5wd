@@ -28,7 +28,7 @@ class BalanceHistoryServiceTest {
     void recordHistory_success() {
         // given
         RecordBalanceHistoryCommand command = new RecordBalanceHistoryCommand(
-                100L, 2000L, BalanceChangeType.CHARGE, "테스트 충전"
+                100L, 2000L, BalanceChangeType.CHARGE, "테스트 충전", null
         );
 
         // when

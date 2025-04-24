@@ -43,7 +43,7 @@ class PaymentFacadeServiceTest {
         Money expectedMoney = Money.wons(amount);
 
         Order order = mock(Order.class);
-        when(orderService.getOrderForPayment(orderId)).thenReturn(order);
+        when(orderService.getOrderForPaymentWithLock(orderId)).thenReturn(order);
 
         Payment mockPayment = Payment.createSuccess(orderId, expectedMoney, method);
         when(paymentService.recordSuccess(any(PaymentCommand.class))).thenReturn(mockPayment);

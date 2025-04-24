@@ -28,7 +28,8 @@ CREATE TABLE balance (
                          user_id BIGINT NOT NULL,
                          amount BIGINT NOT NULL,
                          created_at DATETIME NOT NULL,
-                         updated_at DATETIME NOT NULL
+                         updated_at DATETIME NOT NULL,
+                         version BIGINT NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- Coupon
@@ -105,6 +106,7 @@ CREATE TABLE order_event (
 CREATE TABLE balance_history (
                                  id BIGINT AUTO_INCREMENT PRIMARY KEY,
                                  user_id BIGINT NOT NULL,
+                                 request_id VARCHAR(64) NOT NULL UNIQUE,
                                  amount BIGINT NOT NULL,
                                  type VARCHAR(20) NOT NULL, -- ENUM: CHARGE, DEDUCT
                                  reason TEXT,

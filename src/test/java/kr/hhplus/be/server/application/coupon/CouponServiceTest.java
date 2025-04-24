@@ -41,7 +41,7 @@ class CouponServiceTest {
         Coupon coupon = createValidCoupon();
         IssueLimitedCouponCommand command = new IssueLimitedCouponCommand(userId, couponCode);
 
-        given(couponRepository.findByCode(couponCode)).willReturn(coupon);
+        given(couponRepository.findByCodeForUpdate(couponCode)).willReturn(coupon);
         given(couponIssueRepository.hasIssued(userId, coupon.getId())).willReturn(false);
 
         // when
@@ -65,7 +65,7 @@ class CouponServiceTest {
     void issueCoupon_fail_ifAlreadyIssued() {
         // given
         Coupon coupon = createValidCoupon();
-        given(couponRepository.findByCode(couponCode)).willReturn(coupon);
+        given(couponRepository.findByCodeForUpdate(couponCode)).willReturn(coupon);
         given(couponIssueRepository.hasIssued(userId, coupon.getId())).willReturn(true);
 
         // when & then
@@ -86,7 +86,7 @@ class CouponServiceTest {
                 LocalDateTime.now().minusDays(1)
         );
 
-        given(couponRepository.findByCode(couponCode)).willReturn(coupon);
+        given(couponRepository.findByCodeForUpdate(couponCode)).willReturn(coupon);
 
         // when & then
         assertThrows(CouponException.ExpiredException.class, () ->
@@ -109,7 +109,7 @@ class CouponServiceTest {
                 LocalDateTime.now().plusDays(1)
         );
 
-        given(couponRepository.findByCode(couponCode)).willReturn(coupon);
+        given(couponRepository.findByCodeForUpdate(couponCode)).willReturn(coupon);
 
         // when & then
         assertThrows(CouponException.AlreadyExhaustedException.class, () ->

@@ -9,12 +9,16 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Transactional
+@Transactional(propagation = Propagation.NOT_SUPPORTED)
 class BalanceFacadeIntegrationTest {
 
     @Autowired
@@ -27,16 +31,17 @@ class BalanceFacadeIntegrationTest {
     private BalanceHistoryRepository balanceHistoryRepository;
 
     @Test
-    @DisplayName("초기 잔액 500,000원인 userId=100 유저가 5,000원을 충전하면 잔액은 505,000원이 된다.")
+    @DisplayName("충전 성공 - DB에 이미 존재하는 유저")
     void charge_success_using_seeded_data() {
         // given
-        Long userId = 100L; // 데이터베이스에 이미 존재하는 유저
+        Long userId = 100L; // DB에 이미 존재하는 유저
         Money charge = Money.wons(5_000);
 
         Balance original = balanceRepository.findByUserId(userId).orElseThrow();
         long beforeAmount = original.getAmount();
 
-        ChargeBalanceCriteria criteria = ChargeBalanceCriteria.of(userId, charge.value(), "충전 테스트");
+        String requestId = "REQ-" + UUID.randomUUID();
+        ChargeBalanceCriteria criteria = ChargeBalanceCriteria.of(userId, charge.value(), "충전 테스트", requestId);
 
         // when
         balanceFacade.charge(criteria);
@@ -45,9 +50,11 @@ class BalanceFacadeIntegrationTest {
         Balance updated = balanceRepository.findByUserId(userId).orElseThrow();
         assertThat(updated.getAmount()).isEqualTo(beforeAmount + charge.value());
 
-        BalanceHistory history = balanceHistoryRepository.findAllByUserId(userId).get(0);
-        assertThat(history.getAmount()).isEqualTo(charge.value());
-        assertThat(history.isChargeHistory()).isTrue();
-        assertThat(history.getReason()).isEqualTo("충전 테스트");
+        List<BalanceHistory> histories = balanceHistoryRepository.findAllByUserId(userId);
+        BalanceHistory latest = histories.get(histories.size() - 1); // 최신 기록
+
+        assertThat(latest.getAmount()).isEqualTo(charge.value());
+        assertThat(latest.isChargeHistory()).isTrue();
+        assertThat(latest.getReason()).isEqualTo("충전 테스트");
     }
 }
