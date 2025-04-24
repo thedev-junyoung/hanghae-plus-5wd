@@ -4,6 +4,7 @@ import kr.hhplus.be.server.common.vo.Money;
 import kr.hhplus.be.server.domain.coupon.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -13,8 +14,10 @@ public class CouponService implements CouponUseCase {
     private final CouponIssueRepository couponIssueRepository;
 
     @Override
+    @Transactional
     public CouponResult issueLimitedCoupon(IssueLimitedCouponCommand command) {
-        Coupon coupon = couponRepository.findByCode(command.couponCode());
+        // 락 걸고 조회
+        Coupon coupon = couponRepository.findByCodeForUpdate(command.couponCode());
 
         // 중복 발급 방지
         if (couponIssueRepository.hasIssued(command.userId(), coupon.getId())) {

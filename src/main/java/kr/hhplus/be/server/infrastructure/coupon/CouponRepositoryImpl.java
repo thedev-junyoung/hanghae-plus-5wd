@@ -22,4 +22,10 @@ public class CouponRepositoryImpl implements CouponRepository {
         return jpaRepository.findByCode(code)
                 .orElseThrow(() -> new CouponException.NotFoundException(code));
     }
+
+    @Override
+    public Coupon findByCodeForUpdate(String code) {
+        return jpaRepository.findByCodeForUpdate(code)
+                .orElseThrow(() -> new CouponException.NotFoundException(code));
+    }
 }
