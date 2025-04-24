@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.interfaces.order;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import kr.hhplus.be.server.application.order.CreateOrderCommand;
@@ -16,7 +17,8 @@ public class OrderRequest {
     private Long userId;
 
     @NotEmpty
-    private List<OrderItemRequest> items;
+    @Valid
+    private List<@Valid OrderItemRequest> items;
 
     String couponCode;
 

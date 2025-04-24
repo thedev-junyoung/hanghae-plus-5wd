@@ -16,8 +16,7 @@ public class StockService {
     @Transactional
     public void decrease(DecreaseStockCommand command) {
         ProductStock stock = productStockRepository.findByProductIdAndSizeForUpdate(command.productId(), command.size())
-                .orElseThrow(ProductException.InsufficientStockException::new);
-
+                .orElseThrow(() -> new ProductException.NotFoundException(command.productId()));
         if (stock.getStockQuantity() < command.quantity()) {
             throw new ProductException.InsufficientStockException();
         }
