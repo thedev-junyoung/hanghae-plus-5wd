@@ -29,6 +29,10 @@ public class Balance {
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
+    @Version
+    @Column(nullable = false)
+    private Long version;
+
     public Balance(Long id, Long userId, Money amount) {
         LocalDateTime now = LocalDateTime.now();
         this.id = id;
@@ -61,6 +65,10 @@ public class Balance {
 
     public boolean hasEnough(Money value) {
         return Money.wons(amount).isGreaterThanOrEqual(value);
+    }
+
+    public void reset(Money money) {
+        this.amount = money.value();
     }
 
     // 💡 정책 내장 클래스

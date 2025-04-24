@@ -21,6 +21,9 @@ public class BalanceHistory {
     @Column(nullable = false)
     private Long userId;
 
+    @Column(nullable = false, unique = true)
+    private String requestId;
+
     @Column(nullable = false)
     private long amount;
 
@@ -33,16 +36,17 @@ public class BalanceHistory {
     @Column(nullable = false)
     private LocalDateTime createdAt;
 
-    public BalanceHistory(Long userId, long amount, BalanceChangeType type, String reason, LocalDateTime createdAt) {
+    public BalanceHistory(Long userId, long amount, BalanceChangeType type, String reason, LocalDateTime createdAt, String requestId) {
         this.userId = userId;
         this.amount = amount;
         this.type = type;
         this.reason = reason;
         this.createdAt = createdAt;
+        this.requestId = requestId;
     }
 
-    public static BalanceHistory of(Long userId, long amount, BalanceChangeType type, String reason) {
-        return new BalanceHistory(userId, amount, type, reason, LocalDateTime.now());
+    public static BalanceHistory of(Long userId, long amount, BalanceChangeType type, String reason, String requestId) {
+        return new BalanceHistory(userId, amount, type, reason, LocalDateTime.now(), requestId);
     }
 
     public static BalanceHistory of(RecordBalanceHistoryCommand command) {
@@ -51,9 +55,21 @@ public class BalanceHistory {
                 command.amount(),
                 command.type(),
                 command.reason(),
-                LocalDateTime.now()
+                LocalDateTime.now(),
+                command.requestId()
         );
 
+    }
+
+    public static BalanceHistory charge(Long aLong, long amount, String reason, String requestId) {
+        return new BalanceHistory(
+                aLong,
+                amount,
+                BalanceChangeType.CHARGE,
+                reason,
+                LocalDateTime.now(),
+                requestId
+        );
     }
 
     public boolean isChargeHistory() {

@@ -7,4 +7,8 @@ import java.util.List;
 
 public interface BalanceHistoryJpaRepository extends JpaRepository<BalanceHistory, Long> {
     List<BalanceHistory> findAllByUserId(long userId);
+
+    boolean existsByUserIdAndReason(Long userId, String reason);
+
+    boolean existsByRequestId(String s);
 }
