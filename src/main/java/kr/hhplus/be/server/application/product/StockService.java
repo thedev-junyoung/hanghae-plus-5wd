@@ -13,16 +13,17 @@ public class StockService {
     private final ProductRepository productRepository;
     private final ProductStockRepository productStockRepository;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional
     public void decrease(DecreaseStockCommand command) {
-        Product product = productRepository.findById(command.productId())
-                .orElseThrow(() -> new ProductException.NotFoundException(command.productId()));
-
         ProductStock stock = productStockRepository.findByProductIdAndSizeForUpdate(command.productId(), command.size())
                 .orElseThrow(ProductException.InsufficientStockException::new);
 
-        product.validateOrderable(stock.getStockQuantity());
+        if (stock.getStockQuantity() < command.quantity()) {
+            throw new ProductException.InsufficientStockException();
+        }
+
         stock.decreaseStock(command.quantity());
-        productStockRepository.save(stock);
+
+        productStockRepository.save(stock); // saveAndFlush 필요 없음
     }
 }
