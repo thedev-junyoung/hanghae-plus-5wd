@@ -1,5 +1,6 @@
 package kr.hhplus.be.server.application.balance;
 
+import kr.hhplus.be.server.common.rate.InMemoryRateLimiter;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,6 +29,9 @@ class BalanceFacadeTest {
     @Mock
     private BalanceRetryService retryService;
 
+    @Mock
+    private InMemoryRateLimiter rateLimiter;
+
     @Test
     @DisplayName("충전 시 잔액과 이력 업데이트 성공")
     void charge_shouldUpdateBalance_andRecordHistory() {
@@ -48,6 +52,8 @@ class BalanceFacadeTest {
         assertThat(result.userId()).isEqualTo(expectedResult.userId());
         assertThat(result.balance()).isEqualTo(expectedResult.balance());
 
+
+        verify(rateLimiter).validate(criteria.userId());
         verify(retryService).chargeWithRetry(command);
         verify(historyUseCase).recordHistory(RecordBalanceHistoryCommand.of(criteria));
     }
