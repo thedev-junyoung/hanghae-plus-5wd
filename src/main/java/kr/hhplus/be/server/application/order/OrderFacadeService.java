@@ -5,6 +5,8 @@ import kr.hhplus.be.server.application.coupon.ApplyCouponResult;
 import kr.hhplus.be.server.application.coupon.CouponUseCase;
 import kr.hhplus.be.server.application.product.*;
 import kr.hhplus.be.server.common.vo.Money;
+import org.springframework.aop.framework.AopContext;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import kr.hhplus.be.server.domain.order.Order;
 import kr.hhplus.be.server.domain.order.OrderItem;
@@ -22,6 +24,7 @@ public class OrderFacadeService {
     private final OrderUseCase orderService;
     private final OrderEventUseCase orderEventService;
     private final CouponUseCase couponUseCase;
+    private final StockService stockService;
 
     @Transactional
     public OrderResult createOrder(CreateOrderCommand command) {
@@ -31,16 +34,13 @@ public class OrderFacadeService {
 
         // 2. 각 상품에 대해 주문 상세 구성
         for (CreateOrderCommand.OrderItemCommand item : command.items()) {
-            // 2-1. 상품 상세 조회 (가격 포함)
+            // 2-1. 재고 차감
+            stockService.decrease(DecreaseStockCommand.of(item.productId(), item.size(), item.quantity()));
+
+            // 2-2. 상품 상세 조회 (가격 포함)
             ProductDetailResult product = productService.getProductDetail(
-                    new GetProductDetailCommand(item.productId(), item.size())
+                    GetProductDetailCommand.of(item.productId(), item.size())
             );
-
-            // 2-2. 상품 재고 차감
-            productService.decreaseStock(
-                    new DecreaseStockCommand(item.productId(), item.size(), item.quantity())
-            );
-
             // 2-3. 주문 상품 가격 계산
             Money itemPrice = Money.wons(product.product().price());
             Money itemTotal = itemPrice.multiply(item.quantity());
@@ -67,7 +67,6 @@ public class OrderFacadeService {
         // 6. 응답 객체 반환
         return OrderResult.from(order);
     }
-
 
 }
 
