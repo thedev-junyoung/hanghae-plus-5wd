@@ -2,6 +2,7 @@ package kr.hhplus.be.server.application.balance;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -12,6 +13,7 @@ public class BalanceFacade {
     private final BalanceUseCase balanceService;
     private final BalanceHistoryUseCase historyUseCase;
 
+    @Transactional
     public BalanceResult charge(ChargeBalanceCriteria criteria) {
         ChargeBalanceCommand command = ChargeBalanceCommand.from(criteria);
 

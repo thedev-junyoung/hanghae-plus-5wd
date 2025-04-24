@@ -21,7 +21,6 @@ public class BalanceService implements BalanceUseCase {
     private final BalanceRepository balanceRepository;
     private final BalanceHistoryRepository balanceHistoryRepository;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public BalanceInfo charge(ChargeBalanceCommand command) {
         if (balanceHistoryRepository.existsByRequestId(command.requestId())) {
             log.warn("이미 처리된 충전 요청입니다: userId={}, requestId={}", command.userId(), command.requestId());
