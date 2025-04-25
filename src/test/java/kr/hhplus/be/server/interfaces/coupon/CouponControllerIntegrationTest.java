@@ -35,7 +35,7 @@ class CouponControllerIntegrationTest {
     @Test
     @DisplayName("한정 쿠폰 발급 - 성공")
     void limitedIssueCoupon_success() throws Exception {
-        CouponRequest request = new CouponRequest(100L, "WELCOME10");
+        CouponRequest request = new CouponRequest(100L, "TESTONLY1000");
 
         mockMvc.perform(post("/api/v1/coupons/limited-issue")
                         .header("X-USER-ID", String.valueOf(USER_ID))
@@ -43,6 +43,6 @@ class CouponControllerIntegrationTest {
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.userId").value(100L))
-                .andExpect(jsonPath("$.data.couponType").value("PERCENTAGE")); // 예상 타입
+                .andExpect(jsonPath("$.data.couponType").value("FIXED")); // 예상 타입
     }
 }

@@ -25,7 +25,7 @@ class BalanceControllerIntegrationTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    Long userId = ThreadLocalRandom.current().nextLong(10_000_000, 99_999_999);
+    Long userId = 100L;
 
     @Test
     @DisplayName("잔액 충전 - 성공")
