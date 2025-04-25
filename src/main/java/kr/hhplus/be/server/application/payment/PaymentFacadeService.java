@@ -23,7 +23,8 @@ public class PaymentFacadeService {
         Money amount = Money.wons(command.amount());
 
         // 1. 주문을 가져온다.(주문이 존재하는지, 결제 가능한 상태인지 검증)
-        Order order = orderUseCase.getOrderForPayment(command.orderId());
+//        Order order = orderUseCase.getOrderForPayment(command.orderId());
+        Order order = orderUseCase.getOrderForPaymentWithLock(command.orderId());
 
         // 2. 잔액 차감
         balanceUseCase.decreaseBalance(

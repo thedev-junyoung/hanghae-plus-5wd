@@ -35,5 +35,13 @@ public class OrderService implements OrderUseCase {
         order.markConfirmed();
         orderRepository.save(order);
     }
+
+    @Transactional
+    public Order getOrderForPaymentWithLock(String orderId) {
+        Order order = orderRepository.findByIdForUpdate(orderId)
+                .orElseThrow(() -> new OrderException.NotFoundException(orderId));
+        order.validatePayable();
+        return order;
+    }
 }
 

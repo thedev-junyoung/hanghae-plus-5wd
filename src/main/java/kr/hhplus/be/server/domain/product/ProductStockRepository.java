@@ -9,5 +9,7 @@ public interface ProductStockRepository {
     List<ProductStock> findAllByProductId(Long productId);
     Optional<ProductStock> findByProductIdAndSize(Long productId, int size);
 
+    Optional<ProductStock> findByProductIdAndSizeForUpdate(Long productId, int size);
+
     Optional<ProductStock> findByProductId(Long id);
 }

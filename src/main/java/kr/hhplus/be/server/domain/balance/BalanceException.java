@@ -2,6 +2,7 @@ package kr.hhplus.be.server.domain.balance;
 
 import kr.hhplus.be.server.common.exception.BusinessException;
 import kr.hhplus.be.server.common.exception.ErrorCode;
+import org.springframework.dao.OptimisticLockingFailureException;
 
 public class BalanceException extends BusinessException {
     protected BalanceException(ErrorCode errorCode) {
@@ -35,4 +36,9 @@ public class BalanceException extends BusinessException {
     }
 
 
+    public static class ChargeConflictException extends Throwable {
+        public ChargeConflictException(Long aLong, OptimisticLockingFailureException e) {
+            super("충전 중 충돌 발생 - userId: " + aLong, e);
+        }
+    }
 }

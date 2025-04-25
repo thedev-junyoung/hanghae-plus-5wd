@@ -7,14 +7,16 @@ public record RecordBalanceHistoryCommand(
         Long userId,
         long amount,
         BalanceChangeType type,
-        String reason
+        String reason,
+        String requestId
 ) {
     public static RecordBalanceHistoryCommand of(ChargeBalanceCriteria criteria) {
         return new RecordBalanceHistoryCommand(
                 criteria.userId(),
                 criteria.amount(),
                 BalanceChangeType.CHARGE,
-                criteria.reason()
+                criteria.reason(),
+                criteria.requestId()
         );
     }
     public static RecordBalanceHistoryCommand of(ChargeBalanceCriteria criteria, BalanceChangeType type) {
@@ -22,7 +24,8 @@ public record RecordBalanceHistoryCommand(
                 criteria.userId(),
                 criteria.amount(),
                 type,
-                criteria.reason()
+                criteria.reason(),
+                criteria.requestId()
         );
     }
 }

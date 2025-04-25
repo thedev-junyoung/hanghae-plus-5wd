@@ -49,12 +49,14 @@ public class ProductService implements ProductUseCase {
     }
 
     @Override
+    @Transactional
     public boolean decreaseStock(DecreaseStockCommand command) {
         Product product = productRepository.findById(command.productId())
                 .orElseThrow(() -> new ProductException.NotFoundException(command.productId()));
-
-        ProductStock stock = productStockRepository.findByProductIdAndSize(command.productId(), command.size())
+        // 락 걸린 재고 조회
+        ProductStock stock = productStockRepository.findByProductIdAndSizeForUpdate(command.productId(), command.size())
                 .orElseThrow(ProductException.InsufficientStockException::new);
+
         product.validateOrderable(stock.getStockQuantity());
         stock.decreaseStock(command.quantity());
         productStockRepository.save(stock);

@@ -20,4 +20,7 @@ public interface OrderRepository{
     long count();
 
     Collection<Order> findAll();
+
+    Optional<Order> findByIdForUpdate(String orderId);
+
 }
