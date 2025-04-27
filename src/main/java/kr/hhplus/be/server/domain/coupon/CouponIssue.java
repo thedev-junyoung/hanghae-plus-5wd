@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 
@@ -34,17 +35,18 @@ public class CouponIssue {
     private boolean isUsed = false;
 
     // 생성자
-    public CouponIssue(Long userId, Coupon coupon) {
+    public CouponIssue(Long userId, Coupon coupon, Clock clock) {
         this.userId = userId;
         this.coupon = coupon;
-        this.issuedAt = LocalDateTime.now();
+        this.issuedAt = LocalDateTime.now(clock);
     }
 
-    public static CouponIssue create(Long userId, Coupon coupon) {
-        coupon.validateUsable();
-        coupon.decreaseQuantity();
-        return new CouponIssue(userId, coupon);
+    public static CouponIssue create(Long userId, Coupon coupon, Clock clock) {
+        coupon.validateUsable(clock);
+        coupon.decreaseQuantity(clock);
+        return new CouponIssue(userId, coupon, clock);
     }
+
 
 
     public void markAsUsed() {
@@ -54,18 +56,5 @@ public class CouponIssue {
         this.isUsed = true;
     }
 
-    /**
-     * 유저가 발급받은 쿠폰의 사용 가능 여부를 검증
-     * - 이미 사용한 쿠폰인지 확인
-     * - 쿠폰 정책이 여전히 유효한지 확인(정책 위임)
-     * 이 메서드는 "사용자 관점"에서 쿠폰을 실제 사용할 수 있는지를 판단하며,
-     * 내부적으로는 정책 유효성 또한 포함
-     */
-    public void validateUsable() {
-        if (isUsed) {
-            throw new CouponException.AlreadyIssuedException(userId, coupon.getCode());
-        }
-        coupon.validateUsable(); // 쿠폰 정책에 위임
-    }
 
 }

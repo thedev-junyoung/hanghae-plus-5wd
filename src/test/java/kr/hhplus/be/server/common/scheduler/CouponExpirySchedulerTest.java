@@ -7,6 +7,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -19,6 +20,10 @@ class CouponExpirySchedulerTest {
 
     @InjectMocks
     private CouponExpiryScheduler couponExpiryScheduler;
+
+
+    @Mock
+    private Clock clock;
 
     @BeforeEach
     void setUp() {
@@ -43,7 +48,7 @@ class CouponExpirySchedulerTest {
     void test_expiredCouponsExist() {
         // given
         Coupon expiredCoupon = mock(Coupon.class);
-        when(expiredCoupon.isExpired()).thenReturn(true);
+        when(expiredCoupon.isExpired(clock)).thenReturn(true);
         when(expiredCoupon.getCode()).thenReturn("EXPIRED-COUPON");
         when(expiredCoupon.getValidUntil()).thenReturn(LocalDateTime.now().minusDays(1));
 
@@ -54,6 +59,6 @@ class CouponExpirySchedulerTest {
 
         // then
         verify(couponRepository).findExpiredCoupons();
-        verify(expiredCoupon).isExpired();
+        verify(expiredCoupon).isExpired(clock);
     }
 }

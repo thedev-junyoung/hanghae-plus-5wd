@@ -5,6 +5,7 @@ import kr.hhplus.be.server.common.vo.Money;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 
 @Entity
@@ -80,8 +81,8 @@ public class Coupon {
                 validUntil
         );
     }
-    public boolean isExpired() {
-        return Policy.isExpired(validUntil);
+    public boolean isExpired(Clock clock) {
+        return Policy.isExpired(validUntil, clock);
     }
 
     public boolean isExhausted() {
@@ -95,8 +96,8 @@ public class Coupon {
      * 해당 검증은 쿠폰이 발급되거나 사용할 수 있는 상태인지 판단하는
      * "정책 관점"의 검증
      */
-    public void validateUsable() {
-        if (isExpired()) {
+    public void validateUsable(Clock clock) {
+        if (isExpired(clock)) {
             throw new CouponException.ExpiredException();
         }
         if (isExhausted()) {
@@ -104,8 +105,8 @@ public class Coupon {
         }
     }
 
-    public void decreaseQuantity() {
-        validateUsable();
+    public void decreaseQuantity(Clock clock) {
+        validateUsable(clock);
         this.remainingQuantity -= 1;
     }
 
@@ -118,8 +119,8 @@ public class Coupon {
 
 
     static class Policy {
-        public static boolean isExpired(LocalDateTime until) {
-            return LocalDateTime.now().isAfter(until);
+        public static boolean isExpired(LocalDateTime until, Clock clock) {
+            return LocalDateTime.now(clock).isAfter(until);
         }
 
         public static boolean isExhausted(int quantity) {

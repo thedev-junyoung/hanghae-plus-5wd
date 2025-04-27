@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import java.time.Clock;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -20,11 +21,12 @@ import java.util.List;
 public class CouponExpiryScheduler {
 
     private final CouponRepository couponRepository;
+    private final Clock clock;
 
     @Scheduled(cron = "0 0 0 * * *") // 매일 자정 실행
     public void logExpiredCoupons() {
         List<Coupon> expiredCoupons = couponRepository.findExpiredCoupons().stream()
-                .filter(Coupon::isExpired)
+                .filter(coupon -> coupon.isExpired(clock))
                 .toList();
 
         if (expiredCoupons.isEmpty()) {

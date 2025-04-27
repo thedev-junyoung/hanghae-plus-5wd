@@ -6,12 +6,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Clock;
+
 @Service
 @RequiredArgsConstructor
 public class CouponService implements CouponUseCase {
 
     private final CouponRepository couponRepository;
     private final CouponIssueRepository couponIssueRepository;
+    private final Clock clock;
 
     @Override
     @Transactional
@@ -24,8 +27,11 @@ public class CouponService implements CouponUseCase {
             throw new CouponException.AlreadyIssuedException(command.userId(), command.couponCode());
         }
 
+        // validateUsable에 clock 넘기기
+        coupon.validateUsable(clock);
+
         // 도메인 책임으로 발급 생성 및 수량 차감
-        CouponIssue issue = CouponIssue.create(command.userId(), coupon);
+        CouponIssue issue = CouponIssue.create(command.userId(), coupon, clock);
 
         // 저장
         couponIssueRepository.save(issue);
@@ -35,6 +41,7 @@ public class CouponService implements CouponUseCase {
 
     @Override
     public ApplyCouponResult applyCoupon(ApplyCouponCommand command) {
+        // 쿠폰 코드로 쿠폰 조회
         Coupon coupon = couponRepository.findByCode(command.couponCode());
 
         // 발급받은 쿠폰 이력 조회
@@ -42,7 +49,7 @@ public class CouponService implements CouponUseCase {
                 .orElseThrow(() -> new CouponException.NotIssuedException(command.userId(), command.couponCode()));
 
         // 쿠폰 유효성 및 사용 여부 체크
-        issue.validateUsable();
+        coupon.validateUsable(clock);
 
         // 할인 금액 계산
         Money discount = issue.getCoupon().calculateDiscount(command.orderAmount());
